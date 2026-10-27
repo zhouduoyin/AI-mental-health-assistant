@@ -1,0 +1,141 @@
+// 心理健康 AI 助手 —— 设计令牌
+// 调性：古典洛丽塔星夜。象牙纸底 + 酒红 + 香槟金 + 灰粉，
+// 像一本烫金边的旧诗集：安静、可信，又保留一点舞台感。
+
+// ---- 品牌色 ----
+$color-primary: #75424f;
+$color-primary-strong: #552b37;
+$color-primary-bright: #9d6470;
+$color-primary-soft: #f4e6e9;
+$color-accent: #b5884d;
+$color-accent-soft: #f7ecdb;
+$color-lilac: #b78490;
+$color-lilac-soft: #f6e7ea;
+$color-danger: #a84c3b;
+// 成功态保留绿色语义，不跟品牌酒红混用
+$color-success: #4f8668;
+$color-success-soft: #e7f0e9;
+
+// ---- 深色面板（侧栏 / 页脚 / 登录左栏）----
+$color-dark-950: #140f13;
+$color-dark-900: #1a1318;
+$color-dark-800: #221920;
+$color-dark-700: #1b141a;
+$on-dark-strong: #fff;
+$on-dark: rgba(255, 255, 255, 0.78);
+$on-dark-muted: rgba(255, 255, 255, 0.56);
+$on-dark-faint: rgba(255, 255, 255, 0.5);
+$on-dark-line: rgba(255, 255, 255, 0.12);
+$color-lavender-300: #e4c9a6;
+
+// ---- 中性色 ----
+$color-ink: #241b1f;
+$color-text-primary: #2c2226;
+$color-text-regular: #4f4146;
+$color-text-secondary: #7d6c72;
+$color-line: #e6dccb;
+$color-border: #e6dccb;
+$color-bg: #f6eee2;
+$color-bg-page: #f6eee2;
+$color-bg-sunken: #f0e6d6;
+$color-surface: #fffbf3;
+$color-surface-sunken: #fbf5e9;
+$color-surface-hover: #f9f2e5;
+$color-bg-card: #fffbf3;
+$color-line-soft: #efe7d8;
+
+// ---- 布局 ----
+$container-max: 1160px;
+$page-max: 960px;
+$sidebar-width: 236px;
+// 收起后的侧栏只留图标，宽度够放 44px 的菜单项 + 两侧留白
+$sidebar-collapsed-width: 76px;
+$page-padding-x: 24px;
+$page-padding-top: 40px;
+$page-padding-bottom: 64px;
+
+// ---- 间距（4 的倍数） ----
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 24px;
+$space-6: 32px;
+$space-7: 40px;
+$space-8: 64px;
+
+// ---- 圆角 ----
+$radius-xl: 32px;
+$radius-lg: 24px;
+$radius-card: 18px;
+$radius-sm: 12px;
+$radius-logo: 10px;
+$radius-pill: 999px;
+
+// ---- 字体 ----
+$font-display: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', STSong, SimSun, serif;
+$font-body:
+  Manrope,
+  Inter,
+  -apple-system,
+  BlinkMacSystemFont,
+  'PingFang SC',
+  'Microsoft YaHei',
+  'Helvetica Neue',
+  Arial,
+  sans-serif;
+$font-mono: 'SFMono-Regular', ui-monospace, 'JetBrains Mono', Consolas, monospace;
+$font-size-page-title: 28px;
+$font-size-body: 14px;
+$font-weight-semibold: 600;
+
+// ---- 阴影（偏暖灰，不用纯黑） ----
+$shadow-sm: 0 1px 2px rgba(40, 24, 27, 0.05);
+$shadow-md: 0 18px 40px -24px rgba(40, 24, 27, 0.28);
+$shadow-lg: 0 40px 90px -48px rgba(40, 24, 27, 0.4);
+
+// ---- 动效 ----
+$ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+$ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+$duration-fast: 0.18s;
+$duration-base: 0.32s;
+$duration-slow: 0.6s;
+
+// ---- 响应式断点 ----
+$bp-sm: 640px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+
+// ============================================================
+// 暖光主题（前台 / 登录页 / 后台共用）
+// 象牙纸底 + 酒红 + 香槟金 + 灰粉。像黄昏后点起蜡烛的书房：
+// 低对比、圆润、柔软，但保留足够的可读性。
+// ============================================================
+$warm-950: #f5ecde;
+$warm-900: #faf4e8;
+$warm-850: #fdf9f0;
+$warm-800: #fffcf4;
+$warm-surface: rgba(255, 251, 243, 0.76);
+$warm-surface-strong: #fffcf4;
+$warm-line: rgba(92, 67, 56, 0.14);
+$warm-line-strong: rgba(117, 66, 79, 0.34);
+$warm-text: #27211f;
+$warm-text-regular: #473f3b;
+$warm-text-muted: #6e625b;
+$warm-brand: #75424f;
+$warm-brand-strong: #552b37;
+$warm-brand-soft: #f4e6e9;
+$warm-apricot: #c08a54;
+$warm-butter: #c9a45c;
+$warm-lilac: #b78490;
+$warm-rose: #c98d9b;
+$warm-glow: rgba(117, 66, 79, 0.24);
+$warm-gradient: linear-gradient(100deg, #41232a 0%, #64313b 30%, #7c5a24 64%, #9c7130 100%);
+
+$font-display-serif: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', STSong, SimSun, serif;
+
+// 更有张力的入场 / 退场曲线
+$ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+$ease-in-expo: cubic-bezier(0.7, 0, 0.84, 0);
+// 轻快回弹：只用于小面积 hover / 选中态，别用在页面级移动
+$ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);

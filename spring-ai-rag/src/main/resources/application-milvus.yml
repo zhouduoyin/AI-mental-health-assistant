@@ -1,0 +1,46 @@
+# Milvus 模式：向量写入 WSL/Docker 中的 Milvus，业务数据仍在本机 MySQL。
+#
+# 启动前先确认 Milvus 已就绪：
+#   wsl -d Ubuntu-24.04 -u root -- bash -lc "cd /opt/rag && docker compose up -d"
+#   curl http://localhost:9091/healthz
+#
+# 启动后端：
+#   java -jar target/spring-ai-rag-0.0.1-SNAPSHOT.jar --spring.profiles.active=milvus
+#
+# 控制台：Attu http://localhost:8000（Milvus 地址 milvus:19530，容器内部）
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:springai_rag}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect
+  ai:
+    model:
+      chat: openai
+      # 本地哈希 Embedding（1024 维），无需在线 Embedding Key
+      embedding: none
+    vectorstore:
+      type: milvus
+      milvus:
+        client:
+          host: ${MILVUS_HOST:localhost}
+          port: ${MILVUS_PORT:19530}
+        database-name: ${MILVUS_DATABASE:default}
+        collection-name: rag_documents
+        embedding-dimension: 1024
+        index-type: ivf-flat
+        metric-type: cosine
+        initialize-schema: true
+        auto-id: false
+
+rag:
+  # 哈希 Embedding 的相似度整体偏低，不做阈值过滤
+  similarity-threshold: 0.0
+
+logging:
+  level:
+    com.example.rag: INFO

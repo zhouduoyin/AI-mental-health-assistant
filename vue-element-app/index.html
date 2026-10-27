@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6eee2" />
+    <meta
+      name="description"
+      content="心理健康 AI 助手：随时倾诉、情绪打卡与心理科普，附前台与运营后台演示。"
+    />
+    <!--
+      在应用脚本执行前先恢复主题，避免日间/夜间用户看到错误的底色闪一下。
+      真正的主题状态仍由 src/composables/useTheme.ts 维护。
+    -->
+    <script>
+      try {
+        var storedTheme = localStorage.getItem('mha-theme')
+        var initialTheme = storedTheme === 'night' ? 'night' : 'day'
+        document.documentElement.dataset.theme = initialTheme
+        document.documentElement.style.colorScheme = initialTheme === 'night' ? 'dark' : 'light'
+        var themeMeta = document.querySelector('meta[name="theme-color"]')
+        if (themeMeta) themeMeta.content = initialTheme === 'night' ? '#0a0c13' : '#f6eee2'
+      } catch (error) {
+        document.documentElement.dataset.theme = 'day'
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Google Fonts 的 CSS 有 90KB 左右。首屏不拉取它，等 load 后再插入 stylesheet：
+      首次绘制用系统字体，字体加载完成后 swap；这样既少一个首屏请求，也不阻塞渲染。
+    -->
+    <script>
+      window.addEventListener(
+        'load',
+        function () {
+          var link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href =
+            'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap'
+          document.head.appendChild(link)
+        },
+        { once: true },
+      )
+    </script>
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+    <title>心理健康 AI 助手</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #f5edde;
+      }
+
+      html[data-theme='night'],
+      html[data-theme='night'] body {
+        background: #02070a;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

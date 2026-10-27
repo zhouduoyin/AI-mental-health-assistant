@@ -1,0 +1,50 @@
+// 常用混入。保持无依赖：只接收参数，不引用变量文件。
+
+// 向下（max-width）媒体查询
+@mixin media-down($max-width) {
+  @media (max-width: $max-width) {
+    @content;
+  }
+}
+
+// 向上（min-width）媒体查询
+@mixin media-up($min-width) {
+  @media (min-width: $min-width) {
+    @content;
+  }
+}
+
+// 单行省略
+@mixin truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// 多行省略
+@mixin line-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// flex 居中
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 键盘焦点环
+@mixin focus-ring($color: currentColor) {
+  outline: 2px solid $color;
+  outline-offset: 2px;
+}
+
+// 后台侧栏 / 抽屉共用的深色面板（默认值只做兜底，调用处可按需覆盖）
+@mixin dark-panel($from: #29181b, $to: #1a0f11) {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(170, 130, 138, 0.22), transparent 42%),
+    linear-gradient(180deg, $from 0%, $to 100%);
+}

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring AI RAG 知识库</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --primary: #2f6feb;
+            --primary-dark: #1f56c4;
+            --text: #1f2430;
+            --muted: #6b7280;
+            --border: #e3e8f0;
+            --danger: #d84a4a;
+            --ok: #1f9d6b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        header {
+            background: linear-gradient(120deg, #2f6feb, #6a3ff0);
+            color: #fff;
+            padding: 28px 24px;
+        }
+
+        header h1 { margin: 0 0 6px; font-size: 24px; }
+        header p { margin: 0; opacity: .85; font-size: 14px; }
+
+        main {
+            max-width: 1080px;
+            margin: -18px auto 40px;
+            padding: 0 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 8px 24px rgba(31, 36, 48, .05);
+        }
+
+        .card.wide { grid-column: 1 / -1; }
+
+        .card h2 {
+            margin: 0 0 14px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .badge {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: normal;
+        }
+
+        label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 9px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+            color: var(--text);
+        }
+
+        textarea { min-height: 110px; resize: vertical; }
+
+        button {
+            margin-top: 12px;
+            padding: 9px 16px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: #fff;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        button:hover { background: var(--primary-dark); }
+        button.ghost { background: #eef2fb; color: var(--primary); }
+        button.danger { background: #fdecec; color: var(--danger); }
+        button.small { padding: 5px 10px; font-size: 12px; margin: 0; }
+
+        .row { display: flex; gap: 8px; }
+        .row > * { flex: 1; }
+        .row > button { flex: 0 0 auto; }
+
+        .hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+
+        .list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+
+        .item {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .item .meta { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+        .hit {
+            border-left: 3px solid var(--primary);
+            padding: 8px 12px;
+            background: #f8faff;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .hit b { color: var(--primary); }
+
+        .answer {
+            white-space: pre-wrap;
+            line-height: 1.7;
+            background: #f8faff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .status { display: flex; gap: 22px; flex-wrap: wrap; font-size: 13px; }
+        .status div span { color: var(--muted); }
+        .status b { color: var(--ok); }
+
+        .error { color: var(--danger); font-size: 13px; margin-top: 10px; white-space: pre-wrap; }
+
+        .tabs { display: flex; gap: 6px; margin-bottom: 6px; }
+        .tabs button { margin: 0; padding: 6px 12px; font-size: 13px; background: #eef2fb; color: var(--primary); }
+        .tabs button.active { background: var(--primary); color: #fff; }
+
+        @media (max-width: 760px) {
+            main { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Spring AI RAG 知识库</h1>
+    <p>Spring Boot 3.5 · Spring AI 1.1 · Milvus · MySQL · 内网网关（deepseek-v4-flash）</p>
+</header>
+
+<main>
+    <section class="card wide">
+        <h2>运行状态 <span class="badge">/api/meta</span></h2>
+        <div class="status" id="status">加载中…</div>
+    </section>
+
+    <section class="card">
+        <h2>文档入库 <span class="badge">先入库，再检索/问答</span></h2>
+        <div class="tabs">
+            <button class="active" data-tab="text">粘贴文本</button>
+            <button data-tab="file">上传文件</button>
+        </div>
+
+        <div id="tab-text">
+            <label for="title">标题</label>
+            <input id="title" placeholder="例如：Spring AI 技术栈说明">
+            <label for="source">来源（可选）</label>
+            <input id="source" placeholder="例如：internal-wiki">
+            <label for="content">内容</label>
+            <textarea id="content" placeholder="粘贴需要入库的文本…"></textarea>
+            <button onclick="ingestText()">入库</button>
+        </div>
+
+        <div id="tab-file" hidden>
+            <label for="file">纯文本文件（.txt / .md，UTF-8）</label>
+            <input id="file" type="file" accept=".txt,.md,.markdown,.text">
+            <label for="fileTitle">标题（可选，默认文件名）</label>
+            <input id="fileTitle" placeholder="留空则使用文件名">
+            <button onclick="uploadFile()">上传并入库</button>
+        </div>
+        <div class="error" id="ingestError"></div>
+    </section>
+
+    <section class="card">
+        <h2>知识库文档 <span class="badge" id="docCount"></span></h2>
+        <div class="list" id="docList"></div>
+        <button class="ghost" onclick="loadDocuments()">刷新列表</button>
+    </section>
+
+    <section class="card">
+        <h2>向量检索 <span class="badge">/api/search</span></h2>
+        <div class="row">
+            <input id="searchQuery" placeholder="例如：向量数据库用的什么？">
+            <input id="searchTopK" type="number" min="1" max="20" value="5" style="max-width:80px">
+            <button onclick="search()">检索</button>
+        </div>
+        <div class="list" id="searchResult"></div>
+        <div class="error" id="searchError"></div>
+    </section>
+
+    <section class="card">
+        <h2>知识库问答 <span class="badge">/api/chat</span></h2>
+        <label for="conversationId">会话 ID（可选，留空自动创建）</label>
+        <input id="conversationId" placeholder="例如：demo-001">
+        <label for="question">问题</label>
+        <textarea id="question" placeholder="例如：项目用了哪些技术栈？"></textarea>
+        <button onclick="ask()">提问</button>
+        <div id="answerBox"></div>
+        <div class="error" id="chatError"></div>
+    </section>
+</main>
+
+<script>
+    const $ = (id) => document.getElementById(id);
+
+    function escapeHtml(text) {
+        return String(text == null ? '' : text)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    async function api(path, options) {
+        const response = await fetch(path, options);
+        if (response.status === 204) return null;
+        const text = await response.text();
+        let data = null;
+        try { data = text ? JSON.parse(text) : null; } catch (e) { data = { detail: text }; }
+        if (!response.ok) {
+            throw new Error((data && (data.detail || data.title || data.message)) || ('HTTP ' + response.status));
+        }
+        return data;
+    }
+
+    const json = (body) => ({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+
+    document.querySelectorAll('.tabs button').forEach((button) => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.tabs button').forEach((b) => b.classList.remove('active'));
+            button.classList.add('active');
+            $('tab-text').hidden = button.dataset.tab !== 'text';
+            $('tab-file').hidden = button.dataset.tab !== 'file';
+        });
+    });
+
+    async function loadMeta() {
+        try {
+            const meta = await api('/api/meta');
+            $('status').innerHTML =
+                '<div><span>向量库</span><br><b>' + escapeHtml(meta.vectorStore) + '</b></div>' +
+                '<div><span>对话模型</span><br><b>' + escapeHtml(meta.chatModel) + '</b></div>' +
+                '<div><span>Embedding</span><br><b>' + escapeHtml(meta.embeddingModel) + '</b></div>' +
+                '<div><span>文档数</span><br><b>' + escapeHtml(meta.documents) + '</b></div>';
+        } catch (e) {
+            $('status').textContent = '读取状态失败：' + e.message;
+        }
+    }
+
+    async function loadDocuments() {
+        try {
+            const docs = await api('/api/documents');
+            $('docCount').textContent = '共 ' + docs.length + ' 篇';
+            $('docList').innerHTML = docs.length === 0
+                ? '<div class="hint">还没有文档，先在左侧入库一篇吧。</div>'
+                : docs.map((doc) =>
+                    '<div class="item"><div><b>' + escapeHtml(doc.title) + '</b>' +
+                    '<div class="meta">#' + doc.id + ' · ' + escapeHtml(doc.source || '未标注来源') +
+                    ' · ' + doc.chunkCount + ' 个向量块 · ' + escapeHtml(doc.createdAt) + '</div></div>' +
+                    '<button class="danger small" onclick="removeDocument(' + doc.id + ')">删除</button></div>'
+                ).join('');
+        } catch (e) {
+            $('docList').innerHTML = '<div class="error">' + escapeHtml(e.message) + '</div>';
+        }
+    }
+
+    async function ingestText() {
+        $('ingestError').textContent = '';
+        try {
+            await api('/api/documents', json({
+                title: $('title').value,
+                source: $('source').value,
+                content: $('content').value
+            }));
+            $('title').value = '';
+            $('source').value = '';
+            $('content').value = '';
+            await loadDocuments();
+            await loadMeta();
+        } catch (e) {
+            $('ingestError').textContent = e.message;
+        }
+    }
+
+    async function uploadFile() {
+        $('ingestError').textContent = '';
+        const file = $('file').files[0];
+        if (!file) {
+            $('ingestError').textContent = '请选择文件';
+            return;
+        }
+        const form = new FormData();
+        form.append('file', file);
+        if ($('fileTitle').value) {
+            form.append('title', $('fileTitle').value);
+        }
+        try {
+            await api('/api/documents/upload', { method: 'POST', body: form });
+            $('file').value = '';
+            $('fileTitle').value = '';
+            await loadDocuments();
+            await loadMeta();
+        } catch (e) {
+            $('ingestError').textContent = e.message;
+        }
+    }
+
+    async function removeDocument(id) {
+        if (!confirm('删除文档 #' + id + ' 及其全部向量？')) return;
+        try {
+            await api('/api/documents/' + id, { method: 'DELETE' });
+            await loadDocuments();
+            await loadMeta();
+        } catch (e) {
+            $('docList').innerHTML = '<div class="error">' + escapeHtml(e.message) + '</div>';
+        }
+    }
+
+    async function search() {
+        $('searchError').textContent = '';
+        $('searchResult').innerHTML = '';
+        try {
+            const hits = await api('/api/search', json({
+                query: $('searchQuery').value,
+                topK: Number($('searchTopK').value) || 5
+            }));
+            $('searchResult').innerHTML = hits.length === 0
+                ? '<div class="hint">没有命中任何片段，试试放宽阈值或换一个问法。</div>'
+                : hits.map((hit) =>
+                    '<div class="hit"><b>' + escapeHtml(hit.title || '未命名') + '</b>' +
+                    '　相关度 ' + hit.score + '　块 #' + escapeHtml(hit.chunkIndex) + '\n' +
+                    escapeHtml(hit.text) + '</div>'
+                ).join('');
+        } catch (e) {
+            $('searchError').textContent = e.message;
+        }
+    }
+
+    async function ask() {
+        $('chatError').textContent = '';
+        $('answerBox').innerHTML = '<div class="hint">思考中…</div>';
+        try {
+            const conversationId = $('conversationId').value.trim();
+            const answer = await api('/api/chat', json({
+                conversationId: conversationId || null,
+                question: $('question').value
+            }));
+            $('conversationId').value = answer.conversationId;
+            $('answerBox').innerHTML =
+                '<div class="answer">' + escapeHtml(answer.answer) + '</div>' +
+                (answer.references && answer.references.length
+                    ? '<div class="hint">参考资料：' + answer.references.map((ref) =>
+                        '《' + escapeHtml(ref.title || '未命名') + '》相关度 ' + ref.score).join('，') + '</div>'
+                    : '<div class="hint">本次没有检索到参考资料。</div>');
+            await loadDocuments();
+            await loadMeta();
+        } catch (e) {
+            $('answerBox').innerHTML = '';
+            $('chatError').textContent = e.message;
+        }
+    }
+
+    loadMeta();
+    loadDocuments();
+</script>
+</body>
+</html>

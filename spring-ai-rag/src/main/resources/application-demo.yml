@@ -1,0 +1,43 @@
+# 本地演示 profile：
+#   mvn spring-boot:run -Dspring-boot.run.profiles=demo
+#
+# 无需 MySQL / Milvus / Embedding API：
+#   - H2 内存库代替 MySQL
+#   - SimpleVectorStore 内存向量库代替 Milvus
+#   - 本地哈希 Embedding 代替在线 Embedding（见 DemoAiConfig）
+# 问答仍然调用内网网关，需要设置 ANTHROPIC_AUTH_TOKEN（默认占位符 demo-key 会 401）。
+spring:
+  datasource:
+    # 每次启动使用独立的内存库名，避免多个测试上下文共享同一份数据
+    url: jdbc:h2:mem:ragdemo-${random.uuid};MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+
+  ai:
+    model:
+      chat: openai
+      embedding: none
+    openai:
+      chat:
+        api-key: ${ANTHROPIC_AUTH_TOKEN:demo-key}
+        base-url: ${ANTHROPIC_BASE_URL:http://192.168.0.227}
+        options:
+          model: ${ANTHROPIC_MODEL:deepseek-v4-flash}
+          max-tokens: ${CHAT_MAX_TOKENS:2048}
+          temperature: 0.2
+    vectorstore:
+      type: simple
+
+rag:
+  # 哈希 Embedding 的相似度分布与真实模型不同，演示时放宽阈值
+  similarity-threshold: 0.0
+
+logging:
+  level:
+    com.example.rag: INFO
