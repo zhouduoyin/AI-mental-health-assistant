@@ -26,7 +26,7 @@ spring:
     openai:
       chat:
         api-key: ${ANTHROPIC_AUTH_TOKEN:demo-key}
-        base-url: ${ANTHROPIC_BASE_URL:http://192.168.0.227}
+        base-url: ${ANTHROPIC_BASE_URL:http://your-gateway.example.com}
         options:
           model: ${ANTHROPIC_MODEL:deepseek-v4-flash}
           max-tokens: ${CHAT_MAX_TOKENS:2048}

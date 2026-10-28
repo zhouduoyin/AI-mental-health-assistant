@@ -4,7 +4,7 @@
 
 - 业务库：MySQL 8（文档原文、会话历史）
 - 向量库：Milvus 2.5 standalone（chunk 向量 + 元数据）
-- 对话模型：内网网关 `http://192.168.0.227`（OpenAI 兼容协议，模型 `deepseek-v4-flash`）
+- 对话模型：内网网关 `http://your-gateway.example.com`（OpenAI 兼容协议，模型 `deepseek-v4-flash`）
 - Embedding：任意 OpenAI 兼容接口（默认硅基流动 `BAAI/bge-m3`，1024 维）
 - 框架：Spring Boot 3.5.16 + Spring AI 1.1.8（BOM 管理）+ Maven
 
@@ -158,7 +158,7 @@ java -jar spring-ai-rag\target\spring-ai-rag-0.0.1-SNAPSHOT.jar --spring.profile
 - JDK 17+、Maven 3.9+
 - **Docker Engine**：本机已装在 WSL2 的 Ubuntu-24.04 内；也可以使用 Docker Desktop
   （Milvus standalone 依赖 etcd 与 MinIO，不能只起一个容器）
-- 可访问内网模型网关 `http://192.168.0.227`，并拿到 token（这个网关同时兼容 Anthropic / OpenAI 协议）
+- 可访问内网模型网关 `http://your-gateway.example.com`，并拿到 token（这个网关同时兼容 Anthropic / OpenAI 协议）
 - 可选：一个 OpenAI 兼容的 Embedding 服务，例如硅基流动（<https://siliconflow.cn>）的 `BAAI/bge-m3`
   - 只有 `default` profile 需要；`milvus` profile 用本地哈希 Embedding
   - 网关只负责对话，Embedding 要单独配置；两者用不同的 Key 和 base-url
@@ -195,7 +195,7 @@ CREATE DATABASE IF NOT EXISTS springai_rag DEFAULT CHARACTER SET utf8mb4 COLLATE
 # 对话：内网网关（沿用你现有的 ANTHROPIC_* 变量名）
 $env:ANTHROPIC_AUTH_TOKEN = "sk-xxxxxxxx"
 # 可选，默认就是这两个值
-$env:ANTHROPIC_BASE_URL = "http://192.168.0.227"
+$env:ANTHROPIC_BASE_URL = "http://your-gateway.example.com"
 $env:ANTHROPIC_MODEL = "deepseek-v4-flash"
 
 # Embedding：独立服务
@@ -307,7 +307,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=demo
 | `MYSQL_DATABASE` | `springai_rag` | 库名 |
 | `MYSQL_USERNAME` / `MYSQL_PASSWORD` | `root` / `root` | 账号密码（`local` profile 默认密码为 `123456`） |
 | `ANTHROPIC_AUTH_TOKEN` | 空 | **必填**，内网模型网关 token |
-| `ANTHROPIC_BASE_URL` | `http://192.168.0.227` | 网关地址（走 OpenAI 兼容协议） |
+| `ANTHROPIC_BASE_URL` | `http://your-gateway.example.com` | 网关地址（走 OpenAI 兼容协议） |
 | `ANTHROPIC_MODEL` | `deepseek-v4-flash` | 对话模型名 |
 | `CHAT_MAX_TOKENS` | `2048` | 单次回答最大 token 数 |
 | `EMBEDDING_API_KEY` | 空 | **必填**，Embedding 服务 Key |
@@ -586,7 +586,7 @@ Milvus 集合 `rag_documents` 的字段：`id`（VARCHAR，主键）、`content`
 `EMBEDDING_DIMENSION` 必须等于模型输出维度（bge-m3=1024、text-embedding-v3 默认 1024）。改维度后删除旧集合 `rag_documents` 再启动。
 
 **Q4：内网网关返回 401 / 502？**
-检查 `ANTHROPIC_AUTH_TOKEN` 是否设置、是否过期；确认能访问 `http://192.168.0.227`。demo profile 默认的 `demo-key` 只是占位符，会 401（接口层统一转成 502）。
+检查 `ANTHROPIC_AUTH_TOKEN` 是否设置、是否过期；确认能访问 `http://your-gateway.example.com`。demo profile 默认的 `demo-key` 只是占位符，会 401（接口层统一转成 502）。
 
 **Q5：为什么对话和 Embedding 要分开配置？**
 内网网关只提供对话模型（`deepseek-v4-flash`），没有 Embedding 接口，所以 Embedding 走另一个 OpenAI 兼容服务；`EMBEDDING_*` 三个变量可随时换服务。

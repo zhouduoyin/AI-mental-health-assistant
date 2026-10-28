@@ -73,11 +73,11 @@ spring:
         transcription: none
 
     openai:
-      # 对话：内网网关 http://192.168.0.227，模型 deepseek-v4-flash
+      # 对话：内网网关 http://your-gateway.example.com，模型 deepseek-v4-flash
       # 沿用你当前 shell 里的 ANTHROPIC_* 变量名，避免多记一套配置
       chat:
         api-key: ${ANTHROPIC_AUTH_TOKEN:}
-        base-url: ${ANTHROPIC_BASE_URL:http://192.168.0.227}
+        base-url: ${ANTHROPIC_BASE_URL:http://your-gateway.example.com}
         options:
           model: ${ANTHROPIC_MODEL:deepseek-v4-flash}
           temperature: 0.2
