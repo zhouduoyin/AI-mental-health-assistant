@@ -13,6 +13,16 @@ AI心理健康助手/
 └─ vue-element-app/   # Vue 3 + Vite + Element Plus
 ```
 
+## 界面预览
+
+前台页面截图（使用 `front / front` 演示账号，连接后端 demo 数据）：
+
+| 首页 | AI 咨询 |
+| --- | --- |
+| ![首页](docs/screenshots/front-home.jpg) | ![AI 咨询](docs/screenshots/front-chat.jpg) |
+| **情绪日记** | **知识库** |
+| ![情绪日记](docs/screenshots/front-mood.jpg) | ![知识库](docs/screenshots/front-articles.jpg) |
+
 ## 快速开始
 
 ### vue-element-app
